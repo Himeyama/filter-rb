@@ -63,7 +63,11 @@ class Filter
         # Get analog lowpass prototype
 
         
-
+        if typefunc == "buttap"
+            z, p, k = buttap(n)
+        else
+            raise("未対応")
+        end
 
 
 
@@ -89,7 +93,21 @@ class Filter
         # else:
         #     raise NotImplementedError("'%s' not implemented in iirfilter." % ftype)
 
-        # # Pre-warp frequencies for digital filter design
+        # Pre-warp frequencies for digital filter design
+
+        unless analog
+            if numpy.any(Wn <= 0) or numpy.any(Wn >= 1)
+                if fs
+                    raise
+                end
+                raise
+            end
+            fs = 2.0
+            warped = 2 * fs * tan(pi * Wn / fs)
+        else
+            warped = Wn
+        end
+
         # if not analog:
         #     if numpy.any(Wn <= 0) or numpy.any(Wn >= 1):
         #         if fs is not None:
@@ -101,6 +119,18 @@ class Filter
         #     warped = 2 * fs * tan(pi * Wn / fs)
         # else:
         #     warped = Wn
+
+
+        if ["lowpass", "highpass"].include?(btype)
+            raise if wn.size != 1
+            if btype == "lowpass"
+                z, p, k = lp2lp_zpk(z, p, k, wo=warped)
+            elsif btype == "highpass"
+                z, p, k = lp2hp_zpk(z, p, k, wo=warped)
+            end
+        else
+            raise "未対応"
+        end
 
         # # transform to lowpass, bandpass, highpass, or bandstop
         # if btype in ('lowpass', 'highpass'):
@@ -125,19 +155,21 @@ class Filter
         # else:
         #     raise NotImplementedError("'%s' not implemented in iirfilter." % btype)
 
-        # # Find discrete equivalent if necessary
+        z, p, k = bilinear_zpk(z, p, k, fs) unless analog
+
+        # Find discrete equivalent if necessary
         # if not analog:
         #     z, p, k = bilinear_zpk(z, p, k, fs=fs)
 
-        # # Transform to proper out type (pole-zero, state-space, numer-denom)
+        # Transform to proper out type (pole-zero, state-space, numer-denom)
         # if output == 'zpk':
         #     return z, p, k
         # elif output == 'ba':
         #     return zpk2tf(z, p, k)
         # elif output == 'sos':
         #     return zpk2sos(z, p, k)
-
-
+        raise "未対応" unless output == "ba"
+        [z, p, k]
     end
 
     def butter(n, wn, btype="low", analog=false, output="ba", fs=nil)
