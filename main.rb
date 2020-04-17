@@ -1,7 +1,8 @@
 #!/usr/bin/env ruby
 require "csv"
-
-require "./test"
+require "./buttord"
+require "./butter"
+require "./nmath"
 
 data = []
 CSV.foreach("test.csv").with_index do |row, i|
@@ -24,5 +25,6 @@ ws = fs / fn
 signal = Filter.new
 
 n, wn = signal.buttord(wp, ws, gpass, gstop)
+b, a = signal.butter(n, wn)
 
 p n, wn
