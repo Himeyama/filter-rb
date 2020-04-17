@@ -9,5 +9,6 @@ module NMath
         end
         sinc
     end
+
     module_function :sinc
 end

@@ -28,3 +28,4 @@ n, wn = signal.buttord(wp, ws, gpass, gstop)
 b, a = signal.butter(n, wn)
 
 p n, wn
+p b, a
