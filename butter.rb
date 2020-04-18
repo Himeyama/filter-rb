@@ -32,6 +32,22 @@ class Filter
         [z_lp, p_lp, k_lp]
     end
 
+    def zpk2tf(z, p, k)
+        z = NArray[z]
+        p = NArray[p]
+        # p(z.shape.reverse)
+        if z.shape.size > 1
+            p(z[true, 0].to_a)
+            # p(z[1])
+            temp = NArray[1.000e+00, 1.400e+01, 9.100e+01, 3.640e+02, 1.001e+03, 2.002e+03,
+            3.003e+03, 3.432e+03, 3.003e+03, 2.002e+03, 1.001e+03, 3.640e+02,
+            9.100e+01, 1.400e+01, 1.000e+00]
+            # temp = poly(z[0])
+        else
+            # p("hogehoge")
+        end
+    end
+
     def buttap(n)
         raise "Filter order must be a nonnegative integer" unless n.to_i.abs == n
         z = NArray[]
@@ -76,7 +92,7 @@ class Filter
         end
         z, p, k = bilinear_zpk(z, p, k, fs) unless analog
         raise "未対応" unless output == "ba"
-        [z, p, k]
+        zpk2tf(z, p, k)    
     end
 
     def butter(n, wn, btype="low", analog=false, output="ba", fs=nil)
